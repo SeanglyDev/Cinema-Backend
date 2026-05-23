@@ -16,6 +16,16 @@ export interface VerifyOtpInput {
   otp_code: string;
 }
 
+export interface ForgotPasswordInput {
+  email: string;
+}
+
+export interface ResetPasswordInput {
+  email: string;
+  otp_code: string;
+  new_password: string;
+}
+
 export interface UserFromDB {
   user_id: number;
   role_id: number;

@@ -3,6 +3,12 @@ export const PERMISSIONS = {
   MOVIE_CREATE: 'movie:create',
   MOVIE_UPDATE: 'movie:update',
   MOVIE_DELETE: 'movie:delete',
+  CINEMA_CREATE: 'cinema:create',
+  CINEMA_UPDATE: 'cinema:update',
+  CINEMA_DELETE: 'cinema:delete',
+  HALL_CREATE: 'hall:create',
+  HALL_UPDATE: 'hall:update',
+  HALL_DELETE: 'hall:delete',
   USER_READ: 'user:read',
 } as const;
 

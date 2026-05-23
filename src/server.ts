@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import  './config/db'
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
@@ -11,11 +11,19 @@ app.use(express.json());
 import authRouter from './routes/auth.route';
 app.use('/api/auth', authRouter);
 
+
 import movieRoutes from './routes/movie.route';
 app.use('/api/movies', movieRoutes);
 
 import userRoutes from './routes/user.route';
 app.use('/api/users', userRoutes);
+
+import cinemaRoutes from './routes/cinema.Routes';
+app.use('/api/cinemas', cinemaRoutes);
+
+import hallRoutes from './routes/hall.Routes';
+app.use('/api/halls', hallRoutes);
+
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from Express + TypeScript!');

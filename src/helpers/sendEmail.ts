@@ -10,7 +10,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendOtpEmail(to: string, otp: string) {
+export async function sendOtpEmail(to: string, otp: string, purpose = 'login') {
+  const actionText = purpose === 'reset-password' ? 'reset your password' : 'login';
+
   await transporter.sendMail({
     from: `"CinemaAdmin" <${process.env.EMAIL_USER}>`,
     to,
@@ -18,7 +20,7 @@ export async function sendOtpEmail(to: string, otp: string) {
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
         <h2>Your OTP Code</h2>
-        <p>Use this code to login:</p>
+        <p>Use this code to ${actionText}:</p>
         <h1 style="color: #4CAF50; letter-spacing: 5px;">${otp}</h1>
         <p>This code expires in <b>5 minutes</b>.</p>
         <p>If you did not request this, please ignore this email.</p>

@@ -2,7 +2,14 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db';
 import { sendOtpEmail } from '../helpers/sendEmail';
-import type { RegisterInput, LoginInput, VerifyOtpInput, UserFromDB } from '../@types/auth';
+import type {
+  RegisterInput,
+  LoginInput,
+  VerifyOtpInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+  UserFromDB,
+} from '../@types/auth';
 
 // =====================
 // REGISTER
@@ -118,4 +125,74 @@ export async function verifyOtp(data: VerifyOtpInput): Promise<string> {
   );
 
   return token;
+}
+
+// =====================
+// FORGOT PASSWORD - Step 1
+// =====================
+export async function forgotPassword(data: ForgotPasswordInput): Promise<string> {
+  if (!data.email) throw new Error('Email is required');
+
+  const result = await pool.query(
+    'SELECT * FROM users WHERE email = $1',
+    [data.email]
+  );
+  const user: UserFromDB = result.rows[0];
+  if (!user) throw new Error('Email not found');
+  if (!user.is_active) throw new Error('Account is not active');
+
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  await pool.query(
+    `INSERT INTO otp_token (user_id, otp_code, expires_at, is_used)
+     VALUES ($1, $2, $3, false)`,
+    [user.user_id, otpCode, expiresAt]
+  );
+
+  await sendOtpEmail(user.email, otpCode, 'reset-password');
+
+  return 'Password reset OTP sent to your email';
+}
+
+// =====================
+// RESET PASSWORD - Step 2
+// =====================
+export async function resetPassword(data: ResetPasswordInput): Promise<string> {
+  if (!data.email) throw new Error('Email is required');
+  if (!data.otp_code) throw new Error('OTP code is required');
+  if (!data.new_password) throw new Error('New password is required');
+  if (data.new_password.length < 6) throw new Error('New password must be at least 6 characters');
+
+  const userResult = await pool.query(
+    'SELECT * FROM users WHERE email = $1',
+    [data.email]
+  );
+  const user: UserFromDB = userResult.rows[0];
+  if (!user) throw new Error('User not found');
+  if (!user.is_active) throw new Error('Account is not active');
+
+  const otpResult = await pool.query(
+    `SELECT * FROM otp_token
+     WHERE user_id = $1 AND otp_code = $2 AND is_used = false
+     ORDER BY created_at DESC LIMIT 1`,
+    [user.user_id, data.otp_code]
+  );
+  const otp = otpResult.rows[0];
+  if (!otp) throw new Error('Invalid OTP code');
+  if (new Date() > otp.expires_at) throw new Error('OTP code has expired');
+
+  const hashedPassword = await bcrypt.hash(data.new_password, 10);
+
+  await pool.query(
+    'UPDATE users SET password_hash = $1 WHERE user_id = $2',
+    [hashedPassword, user.user_id]
+  );
+
+  await pool.query(
+    'UPDATE otp_token SET is_used = true WHERE otp_id = $1',
+    [otp.otp_id]
+  );
+
+  return 'Password reset successful. Please login with your new password.';
 }
