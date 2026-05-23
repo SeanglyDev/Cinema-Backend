@@ -379,3 +379,136 @@ Response:
   "message": "Hall deleted"
 }
 
+==================================================
+SEATS
+==================================================
+
+1. Get All Seats
+GET http://localhost:3000/api/seats
+
+Request:
+No body
+
+Response:
+{
+  "success": true,
+  "data": []
+}
+
+2. Get Seats By Hall ID
+GET http://localhost:3000/api/seats/hall/1
+
+Request:
+No body
+
+Response:
+{
+  "success": true,
+  "data": []
+}
+
+3. Get Seat By ID
+GET http://localhost:3000/api/seats/1
+
+Request:
+No body
+
+Response:
+{
+  "success": true,
+  "data": {
+    "seat_id": 1,
+    "hall_id": 1,
+    "seat_number": "A1",
+    "seat_type": "standard"
+  }
+}
+
+4. Add One Seat - Admin Token Required
+POST http://localhost:3000/api/seats
+
+Request:
+{
+  "hall_id": 1,
+  "seat_number": "A1",
+  "seat_type": "standard"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "seat_id": 1,
+    "hall_id": 1,
+    "seat_number": "A1",
+    "seat_type": "standard"
+  }
+}
+
+Duplicate response:
+{
+  "success": false,
+  "message": "Seat number already exists in this hall"
+}
+
+5. Add Seats By Capacity - Admin Token Required
+POST http://localhost:3000/api/seats/bulk
+
+Request:
+{
+  "hall_id": 1,
+  "capacity": 100,
+  "seat_type": "standard"
+}
+
+Response:
+{
+  "success": true,
+  "message": "100 seats created successfully",
+  "data": [
+    {
+      "seat_id": 1,
+      "hall_id": 1,
+      "seat_number": "A1",
+      "seat_type": "standard"
+    },
+    {
+      "seat_id": 100,
+      "hall_id": 1,
+      "seat_number": "J10",
+      "seat_type": "standard"
+    }
+  ]
+}
+
+6. Update Seat - Admin Token Required
+PUT http://localhost:3000/api/seats/1
+
+Request:
+{
+  "seat_number": "A2",
+  "seat_type": "vip"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "seat_id": 1,
+    "hall_id": 1,
+    "seat_number": "A2",
+    "seat_type": "vip"
+  }
+}
+
+7. Delete Seat - Admin Token Required
+DELETE http://localhost:3000/api/seats/1
+
+Request:
+No body
+
+Response:
+{
+  "success": true,
+  "message": "Seat deleted"
+}
