@@ -1,5 +1,5 @@
 import pool from '../config/db';
-import type { UpdateUserInput, UserListItem } from '../@types/user';
+import type { CreateUserInput, UpdateUserInput, UserListItem } from '../@types/user';
 
 export async function getAllUsers(): Promise<UserListItem[]> {
   const result = await pool.query(
@@ -58,6 +58,24 @@ export async function getUserByEmail(email: string): Promise<UserListItem | null
   );
 
   return result.rows[0] || null;
+}
+
+export async function createUser(data: CreateUserInput & { password_hash: string }): Promise<UserListItem | null> {
+  const result = await pool.query(
+    `INSERT INTO users (role_id, name, email, password_hash, profile_user, is_active)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING user_id`,
+    [
+      data.role_id,
+      data.name,
+      data.email,
+      data.password_hash,
+      data.profile_user ?? null,
+      data.is_active ?? true,
+    ]
+  );
+
+  return await getUserById(result.rows[0].user_id);
 }
 
 export async function updateUser(id: number, data: UpdateUserInput): Promise<UserListItem | null> {

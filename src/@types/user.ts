@@ -9,6 +9,15 @@ export interface UserListItem {
   created_at: Date | null;
 }
 
+export interface CreateUserInput {
+  role_id: number;
+  name: string;
+  email: string;
+  password: string;
+  profile_user?: string | null;
+  is_active?: boolean;
+}
+
 export interface UpdateUserInput {
   role_id?: number;
   name?: string;

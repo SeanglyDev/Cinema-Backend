@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type { AuthenticatedUser } from '../@types/auth';
-import { ROLES } from '../authorization/roles';
+import { PERMISSIONS } from '../authorization/permissions';
+import { ROLES, roleHasPermission } from '../authorization/roles';
 import {
   fetchAllBookings,
   fetchBookingById,
@@ -79,9 +80,16 @@ export async function create(req: Request, res: Response) {
       return;
     }
 
+    const canCreateForOthers = roleHasPermission(user.role_id, PERMISSIONS.BOOKING_CREATE);
+
+    if (user.role_id !== ROLES.CUSTOMER && !canCreateForOthers) {
+      res.status(403).json({ success: false, message: 'You do not have permission' });
+      return;
+    }
+
     const booking = await addBooking({
       ...req.body,
-      user_id: user.user_id,
+      user_id: canCreateForOthers && req.body.user_id ? Number(req.body.user_id) : user.user_id,
     });
     res.status(201).json({ success: true, data: booking });
   } catch (error: any) {

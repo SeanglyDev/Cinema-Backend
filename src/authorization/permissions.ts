@@ -22,6 +22,7 @@ export const PERMISSIONS = {
   PAYMENT_CREATE: 'payment:create',
   TICKET_READ: 'ticket:read',
   TICKET_UPDATE: 'ticket:update',
+  USER_CREATE: 'user:create',
   USER_READ: 'user:read',
   USER_UPDATE: 'user:update',
   USER_DELETE: 'user:delete',

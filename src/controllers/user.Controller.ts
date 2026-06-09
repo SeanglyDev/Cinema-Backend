@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { editUser, fetchAllUsers, fetchUserById, removeUser } from '../services/user.Service';
+import { addUser, editUser, fetchAllUsers, fetchUserById, removeUser } from '../services/user.Service';
 
 export async function getAllUsers(req: Request, res: Response): Promise<void> {
   try {
@@ -16,6 +16,15 @@ export async function getUserById(req: Request, res: Response): Promise<void> {
     res.json({ success: true, data: user });
   } catch (error: any) {
     res.status(404).json({ success: false, message: error.message });
+  }
+}
+
+export async function createUser(req: Request, res: Response): Promise<void> {
+  try {
+    const user = await addUser(req.body);
+    res.status(201).json({ success: true, data: user });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
   }
 }
 
