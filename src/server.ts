@@ -33,6 +33,9 @@ app.use('/api/showtimes', showTimeRoutes);
 import bookingRoutes from './routes/booking.Routes';
 app.use('/api/bookings', bookingRoutes);
 
+import ticketRoutes from './routes/ticket.Routes';
+app.use('/api', ticketRoutes);
+
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from Express + TypeScript!');
